@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bypassy AI | Gemini</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            scroll-behavior: smooth;
+        }
+
+        /* Hide scrollbar */
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb {
+            background: var(--glass-border);
+            border-radius: 10px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 1rem 1.5rem;
+            border-radius: 20px;
+            line-height: 1.5;
+            position: relative;
+            animation: messageAppear 0.3s ease-out forwards;
+        }
+
+        @keyframes messageAppear {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: var(--accent-gradient);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.ai {
+            align-self: flex-start;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-bottom-left-radius: 4px;
+        }
+
+        .img-preview-msg {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .input-area {
+            background: var(--bg-dark);
+            border-top: 1px solid var(--glass-border);
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .input-wrapper {
+            max-width: 1000px;
+            width: 100%;
+            display: flex;
+            align-items: flex-end;
+            gap: 1rem;
+            background: var(--glass);
+            padding: 0.75rem;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.2);
+        }
+
+        #chat-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 0.5rem;
+            font-size: 1rem;
+            resize: none;
+            min-height: 24px;
+            max-height: 200px;
+            outline: none;
+        }
+
+        .input-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            background: var(--glass-border);
+            color: white;
+        }
+
+        #image-preview-container {
+            display: none;
+            padding: 0.5rem;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--glass-border);
+            width: 100%;
+        }
+
+        .preview-thumbnail {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            position: relative;
+            border: 1px solid var(--glass-border);
+        }
+
+        .remove-img {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .typing {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="background-glow">
+        <div class="glow-orb orb-1"></div>
+    </div>
+
+    <header>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <a href="main.html" class="btn-secondary" style="padding: 8px 12px; border-radius: 50%;">←</a>
+            <div class="logo">BYPASSY AI</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <select id="ai-mode" class="glass-panel"
+                style="padding: 5px 10px; color: white; border-radius: 8px; font-size: 0.8rem; cursor: pointer;">
+                <option value="A">AI Option A</option>
+                <option value="B">AI Option B</option>
+            </select>
+            <div class="status" style="font-size: 0.8rem; color: #00ff88;">Gemini Online</div>
+        </div>
+    </header>
+
+    <div class="chat-container" id="chat-messages">
+        <div class="message ai">
+            Hello! I'm your AI assistant powered by Gemini. You can switch between AI Option A and B in the header. Text
+            and images are both supported!
+        </div>
+    </div>
+
+    <div class="input-area">
+        <div style="width: 100%; max-width: 1000px;">
+            <div id="image-preview-container"></div>
+            <div class="input-wrapper">
+                <button class="action-btn" onclick="document.getElementById('file-input').click()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                </button>
+                <input type="file" id="file-input" hidden accept="image/*" multiple>
+                <textarea id="chat-input" placeholder="Ask me anything..." rows="1"></textarea>
+                <button class="btn-premium" id="send-btn" style="padding: 10px 15px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+            <div class="typing" id="typing-indicator">Gemini is thinking...</div>
+        </div>
+    </div>
+
+    <script>
+        const KEYS = {
+            A: "AIzaSyDK1zFOQKQGm_htraELnA9lQRBxtLlgdcE",
+            B: "AIzaSyBdG_Ce61meJPNRCBq0sysOLPH0CoSp74E"
+        };
+        const MODEL = "models/gemini-flash-lite-latest";
+        const aiModeSelect = document.getElementById('ai-mode');
+        const chatInput = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        const chatMessages = document.getElementById('chat-messages');
+        const fileInput = document.getElementById('file-input');
+        const previewContainer = document.getElementById('image-preview-container');
+        const typingIndicator = document.getElementById('typing-indicator');
+
+        let attachedImages = [];
+        let conversationHistory = [];
+
+        // Auto-resize textarea
+        chatInput.addEventListener('input', () => {
+            chatInput.style.height = 'auto';
+            chatInput.style.height = chatInput.scrollHeight + 'px';
+        });
+
+        // Handle Paste
+        window.addEventListener('paste', (e) => {
+            const items = e.clipboardData.items;
+            for (let item of items) {
+                if (item.type.indexOf('image') !== -1) {
+                    const file = item.getAsFile();
+                    addImage(file);
+                }
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            files.forEach(addImage);
+            fileInput.value = '';
+        });
+
+        function addImage(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const base64 = e.target.result.split(',')[1];
+                const mimeType = file.type;
+                const src = e.target.result;
+
+                const imgId = Date.now() + Math.random();
+                attachedImages.push({ id: imgId, base64, mimeType, src });
+
+                renderPreviews();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function renderPreviews() {
+            if (attachedImages.length > 0) {
+                previewContainer.style.display = 'flex';
+            } else {
+                previewContainer.style.display = 'none';
+            }
+
+            previewContainer.innerHTML = attachedImages.map(img => `
+                <div style="position: relative;">
+                    <img src="${img.src}" class="preview-thumbnail">
+                    <div class="remove-img" onclick="removeImage(${img.id})">×</div>
+                </div>
+            `).join('');
+        }
+
+        window.removeImage = (id) => {
+            attachedImages = attachedImages.filter(img => img.id !== id);
+            renderPreviews();
+        };
+
+        async function sendMessage() {
+            const text = chatInput.value.trim();
+            if (!text && attachedImages.length === 0) return;
+
+            // Add user message to UI
+            addMessageToUI('user', text, attachedImages.map(img => img.src));
+
+            const payloadText = text;
+            const payloadImages = [...attachedImages];
+
+            // Add to history
+            const userContent = {
+                role: "user",
+                parts: []
+            };
+            if (payloadText) userContent.parts.push({ text: payloadText });
+            payloadImages.forEach(img => {
+                userContent.parts.push({
+                    inline_data: {
+                        mime_type: img.mimeType,
+                        data: img.base64
+                    }
+                });
+            });
+            conversationHistory.push(userContent);
+
+            // Clear input
+            chatInput.value = '';
+            chatInput.style.height = 'auto';
+            attachedImages = [];
+            renderPreviews();
+
+            typingIndicator.style.display = 'block';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            try {
+                const response = await callGemini();
+                typingIndicator.style.display = 'none';
+                addMessageToUI('ai', response);
+
+                // Add AI response to history
+                conversationHistory.push({
+                    role: "model",
+                    parts: [{ text: response }]
+                });
+
+                // Optional: Keep history manageable (e.g. last 50 messages)
+                if (conversationHistory.length > 100) {
+                    conversationHistory = conversationHistory.slice(-100);
+                }
+            } catch (error) {
+                typingIndicator.style.display = 'none';
+                addMessageToUI('ai', 'Error: ' + error.message);
+                // Remove failed user message from history if you want to allow retry
+                conversationHistory.pop();
+            }
+        }
+
+        function addMessageToUI(sender, text, images = []) {
+            const div = document.createElement('div');
+            div.className = `message ${sender}`;
+
+            let html = '';
+            if (images.length > 0) {
+                images.forEach(img => {
+                    html += `<img src="${img}" class="img-preview-msg">`;
+                });
+            }
+            if (text) {
+                html += `<div>${text.replace(/\n/g, '<br>')}</div>`;
+            }
+
+            div.innerHTML = html;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function callGemini() {
+            const currentKey = KEYS[aiModeSelect.value];
+            const url = `https://generativelanguage.googleapis.com/v1beta/${MODEL}:generateContent?key=${currentKey}`;
+
+            // Use the full conversation history
+            const body = {
+                contents: conversationHistory
+            };
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            const data = await response.json();
+            if (data.error) {
+                throw new Error(data.error.message);
+            }
+
+            if (!data.candidates || !data.candidates[0].content || !data.candidates[0].content.parts) {
+                throw new Error("Invalid response from AI");
+            }
+
+            return data.candidates[0].content.parts[0].text;
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Add a Clear Chat button to UI via JS for simplicity
+        const headerActions = document.querySelector('header div:last-child');
+        const clearBtn = document.createElement('button');
+        clearBtn.innerHTML = 'Clear Chat';
+        clearBtn.className = 'glass-panel';
+        clearBtn.style.cssText = 'padding: 5px 10px; color: #ff4757; border-radius: 8px; font-size: 0.8rem; cursor: pointer; margin-right: 1rem;';
+        clearBtn.onclick = () => {
+            conversationHistory = [];
+            chatMessages.innerHTML = `
+                <div class="message ai">
+                    Chat cleared. How can I help you today?
+                </div>
+            `;
+        };
+        headerActions.insertBefore(clearBtn, headerActions.firstChild);
+    </script>
+</body>
+
+</html>

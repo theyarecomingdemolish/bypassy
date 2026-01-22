@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bypassy Classroom | Unrestricted Learning</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            max-width: 600px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .feature-card {
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--primary);
+        }
+
+        .feature-card i {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .feature-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .icon-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="background-glow">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
+    <header class="fade-in">
+        <div class="logo">BYPASSY CLASSROOM</div>
+        <div class="nav-links">
+            <a href="#" class="btn-secondary">Settings</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="hero fade-in">
+            <h1>Your Digital Classroom</h1>
+            <p>Access the web without limits and chat with advanced AI, all in one premium interface.</p>
+        </div>
+
+        <div class="features fade-in" style="animation-delay: 0.2s;">
+            <div class="glass-panel feature-card" onclick="window.location.href='/proxy.html'">
+                <div class="icon-circle">🌐</div>
+                <h2>School Proxy</h2>
+                <p>Bypass school filters with Scramjet. Fast, secure, and undetectable.</p>
+                <button class="btn-premium">Launch Proxy</button>
+            </div>
+
+            <div class="glass-panel feature-card" onclick="window.location.href='/ai.html'">
+                <div class="icon-circle">✨</div>
+                <h2>Gemini AI</h2>
+                <p>Chat with Gemini Flash Lite. Handles text and images with lightning speed.</p>
+                <button class="btn-premium">Open AI</button>
+            </div>
+        </div>
+    </main>
+
+    <footer style="padding: 2rem; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
+        &copy; 2026 Bypassy. For educational purposes only.
+    </footer>
+</body>
+
+</html>
